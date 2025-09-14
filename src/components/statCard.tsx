@@ -1,4 +1,20 @@
-export default function StatCard({ title, value, icon: Icon, color, subtitle }) {
+import { LucideIcon } from "lucide-react"; // or lucide-react if you're using it
+
+type StatCardProps = {
+  title: string;
+  value: string | number;
+  icon: LucideIcon; // the icon component
+  color: string;
+  subtitle?: string;
+};
+
+export default function StatCard({
+  title,
+  value,
+  icon: Icon,
+  color,
+  subtitle,
+}: StatCardProps) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
       <div className="flex items-center justify-between">
