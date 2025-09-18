@@ -7,7 +7,7 @@ await connectToDatabase();
 export async function POST(req: Request) {
   try {
 
-    const {newExpense} = await req.json();
+    const newExpense = await req.json();
     console.log("Route",newExpense)
     console.log("name", newExpense.name);
 
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
         expense_category : newExpense.category,
         expense_description: newExpense.description,
         expense_amount: newExpense.amount,
+        expense_date: newExpense.date
         
     });
     await newE.save();

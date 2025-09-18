@@ -124,13 +124,13 @@ export default function Sales() {
               Colleague
             </label>
             <select
-              value={formData.item}
+              value={formData.colleague}
               onChange={(e) =>
                 setFormData({ ...formData, colleague: e.target.value })
               }
               className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition"
             >
-              <option value="">Select Colleague</option>
+              <option value="" disabled>Select Colleague</option>
               <option value="Alpha">Alpha</option>
               <option value="Beta">Beta</option>
             </select>

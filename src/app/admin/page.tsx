@@ -30,8 +30,24 @@ import {
   Menu,
 } from "lucide-react";
 import StatCard from "@/components/statCard";
-
+import {
+  getItems,
+  addItem,
+  getExpense,
+  getSales,
+  addExpense,
+  updateProduct,
+  deleteItemRoute,
+  deleteSalesRoute,
+  deleteExpenseRoute,
+} from "@/../lib/api";
 import { SwatchesPicker } from "react-color";
+import OrderSuccessPopup from "@/components/orderSucess";
+import OrderErrorPopup from "@/components/orderError";
+import ItemTable from "@/components/itemTable";
+import SalesTable from "@/components/salesTable";
+import ExpenseTable from "@/components/expenseTable";
+import { RingLoader } from "react-spinners";
 
 type Item = {
   _id: string;
@@ -54,45 +70,63 @@ type Sales = {
 };
 
 type Expense = {
-  id: number;
-  category: string;
-  description: string;
-  amount: number;
-  date: string;
+  _id: string;
+  expense_category: string;
+  expense_description: string;
+  expense_amount: number;
+  expense_date: string;
 };
 
-const StudentSalesManager = () => {
+export default function StudentSalesManager() {
   useEffect(() => {
-    fetchItems();
-    fetchSales();
+    getItems().then(setItems);
+    getExpense().then(setExpenses);
+    getSales().then(setSales);
   }, []);
 
-  async function fetchItems() {
-    try {
-      const res = await fetch("/api/getItem");
-      const data = await res.json();
-      console.log(data);
-      setItems(data);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function fetchSales() {
-    try {
-      const res = await fetch("/api/getSales");
-      const data = await res.json();
-      console.table("table", data);
-      setSales(data);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
+  const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
   const [sales, setSales] = useState<Sales[]>([]);
   const [color, setColor] = useState("#ffff");
   const defaultcolor = "#87CEEB";
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [result, setResult] = useState({
+    type: " ",
+    message: " ",
+  });
+
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: "",
+    stock: "",
+    description: "",
+    color: defaultcolor,
+  });
+
+  const [newExpense, setNewExpense] = useState({
+    category: "",
+    description: "",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+  });
+  const [customCategory, setCustomCategory] = useState("");
+  const [editingProduct, setEditingProduct] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(false);
+
+  const [updatedProduct, setUpdatedProduct] = useState({
+    _id: "",
+    name: "",
+    price: "",
+    stock: "",
+    description: "",
+    color: defaultcolor,
+  });
+  const [editingSales, setEditingSales] = useState(false);
+
+  // Sample data for charts
+
+  const [expenses, setExpenses] = useState<Expense[]>([]);
 
   function getWeekNumber(date: string) {
     const d = new Date(date);
@@ -120,55 +154,48 @@ const StudentSalesManager = () => {
     };
   });
 
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    description: "",
-    color: defaultcolor,
-  });
-
-  const [newExpense, setNewExpense] = useState({
-    category: "",
-    description: "",
-    amount: "",
-  });
-  const [customCategory, setCustomCategory] = useState("");
-  const [editingProduct, setEditingProduct] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
-
-  // Sample data for charts
-
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.expense_amount, 0);
 
   const totalRevenue = sales.reduce((sum, order) => sum + order.total, 0);
   const totalOrders = sales.length;
   const lowStockItems = items.filter((item) => item.item_stock < 5);
 
-  const addProduct = async () => {
-    //alert("selected color" + color);
-    console.log(newProduct);
-
+  async function addProduct() {
+    setLoading(true)
     try {
-      const res = await fetch("/api/addItem", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ newProduct }),
+      await addItem(newProduct);
+      const update = await getItems();
+      setItems(update);
+
+      setResult({ type: "", message: "" });
+
+      setTimeout(() => {
+        setResult({
+          type: "success",
+          message: "Product added successfully",
+        });
+      }, 10);
+
+      setNewProduct({
+        name: "",
+        price: "",
+        stock: "",
+        description: "",
+        color: defaultcolor,
       });
-
-      fetchItems();
-    } catch (e) {}
-  };
-
-  const addExpense = async () => {
+    } catch {
+      setResult({ type: "", message: "" });
+      setTimeout(() => {
+        setResult({
+          type: "error",
+          message: "Product failed to add, try again",
+        });
+      }, 10);
+    } finally {
+      setLoading(false)
+    }
+  }
+  async function handleExpense() {
     const categoryToSave =
       newExpense.category === "Other" ? customCategory : newExpense.category;
 
@@ -177,36 +204,172 @@ const StudentSalesManager = () => {
       category: categoryToSave,
     };
 
+    console.log(expenseToSave);
+    setLoading(true)
     try {
-      const res = await fetch("/api/addExpense", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ newProduct }),
+      await addExpense(expenseToSave);
+      const update = await getExpense();
+      setExpenses(update);
+
+      setResult({ type: "", message: "" });
+
+      setTimeout(() => {
+        setResult({
+          type: "success",
+          message: "Expenses added successfully",
+        });
+      }, 10);
+
+      setNewExpense({
+        category: "",
+        description: "",
+        amount: "",
+        date: new Date().toISOString().split("T")[0],
       });
+    } catch {
+      setResult({ type: "", message: "" });
+      setTimeout(() => {
+        setResult({
+          type: "error",
+          message: "Expenses failed to add, try again",
+        });
+      }, 10);
+    } finally {
+      setLoading(false)
+    }
+  }
 
-      fetchItems();
-    } catch (e) {}
+  async function updateItem(id: string) {
+    UpdateModalItem(id);
+    setLoading(true)
+    try {
+      await updateProduct(updatedProduct);
+      const update = await getItems();
+      setItems(update);
 
-    console.log(newExpense);
+      setResult({ type: "", message: "" });
+
+      setTimeout(() => {
+        setResult({
+          type: "success",
+          message: "Product update successfully",
+        });
+      }, 10);
+    } catch (e) {
+      setResult({ type: "", message: "" });
+      setTimeout(() => {
+        setResult({
+          type: "error",
+          message: "Product failed to add, try again",
+        });
+      }, 10);
+    }finally{
+      setLoading(false)
+    }
+    setEditingProduct(false);
+    //console.log(updatedProduct);
+  }
+  const UpdateModalItem = async (id: string) => {
+    setEditingProduct(true);
+    const product = items.find((i) => i._id === id);
+    if (!product) return;
+
+    console.log(product);
+    console.log(updatedProduct);
+
+    setUpdatedProduct({
+      _id: product._id,
+      name: product.item_name,
+      price: product.item_price.toString(),
+      stock: product.item_stock.toString(),
+      description: product.item_description,
+      color: product.item_color,
+    });
   };
 
-  const updateItem = () => {
-    //setEditingProduct(false);
-  };
+  async function deleteItem(id: string) {
+    setLoading(true)
+    try {
+      await deleteItemRoute(id);
+      const update = await getItems();
+      setItems(update);
 
-  //const deleteProduct = (id) => {};
+      setResult({ type: "", message: "" });
 
-  // const filteredOrders = orders.filter((order) => {
-  //   const matchesSearch =
-  //     order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     order.item.toLowerCase().includes(searchTerm.toLowerCase());
-  //   const matchesFilter =
-  //     filterStatus === "All" || order.status === filterStatus;
-  //   return matchesSearch && matchesFilter;
-  // });
+      setTimeout(() => {
+        setResult({
+          type: "success",
+          message: "Product deleted successfully",
+        });
+      }, 10);
+    } catch (e) {
+      setResult({ type: "", message: "" });
+      setTimeout(() => {
+        setResult({
+          type: "error",
+          message: "Product deletion failed, try again",
+        });
+      }, 10);
+    } finally {
+      setLoading(false)
+    }
+  }
 
+  async function deleteSale(id: string) {
+    setLoading(true)
+    try {
+      await deleteSalesRoute(id);
+      const update = await getSales();
+      setSales(update);
+
+      setResult({ type: "", message: "" });
+
+      setTimeout(() => {
+        setResult({
+          type: "success",
+          message: "Sale deleted successfully",
+        });
+      }, 10);
+    } catch (e) {
+      setResult({ type: "", message: "" });
+      setTimeout(() => {
+        setResult({
+          type: "error",
+          message: "Sale deletion failed, try again",
+        });
+      }, 10);
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function deleteExpense(id: string) {
+    setLoading(true)
+    try {
+      await deleteExpenseRoute(id);
+      const update = await getExpense();
+      setExpenses(update);
+
+      setResult({ type: "", message: "" });
+
+      setTimeout(() => {
+        setResult({
+          type: "success",
+          message: "Expense deleted successfully",
+        });
+      }, 10);
+    } catch (e) {
+      setResult({ type: "", message: "" });
+      setTimeout(() => {
+        setResult({
+          type: "error",
+          message: "Sale deletion failed, try again",
+        });
+      }, 10);
+    } finally {
+      setLoading(false)
+    }
+  }
   const pieData = items
     .map((item) => {
       // Sum total sales for this item
@@ -222,10 +385,23 @@ const StudentSalesManager = () => {
     })
     .filter((d) => d.value > 0); // remove items with 0 sales
 
-     const tabs = ["dashboard", "products", "orders", "expenses"];
+  const tabs = ["dashboard", "products", "orders", "expenses"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+      {result.type === "success" && (
+        <OrderSuccessPopup message={result.message} />
+      )}
+      {result.type === "error" && <OrderErrorPopup message={result.message} />}
+      {loading && (
+        <div className="fixed inset-0 bg-transparent bg-opacity-40 flex items-center justify-center z-50 ">
+          <div className="flex flex-col items-center">
+            
+          <RingLoader color="black" speedMultiplier={2}/>
+            <p className="mt-4 text-black font-semibold">Loading...</p>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="bg-white rounded-3xl p-8 mb-8 shadow-lg border border-gray-100">
@@ -239,11 +415,14 @@ const StudentSalesManager = () => {
           </div>
         </div>
 
+        {/* Navigation */}
 
         {/* Navigation */}
-        
-        {/* Navigation */}
-        <div className={`bg-white rounded-2xl p-2 mb-4 sm:mb-8 shadow-lg border border-gray-100 ${isMobileMenuOpen ? 'block' : 'hidden md:block'}`}>
+        <div
+          className={`bg-white rounded-2xl p-2 mb-4 sm:mb-8 shadow-lg border border-gray-100 ${
+            isMobileMenuOpen ? "block" : "hidden md:block"
+          }`}
+        >
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
             {tabs.map((tab) => (
               <button
@@ -264,7 +443,6 @@ const StudentSalesManager = () => {
           </div>
         </div>
 
-        
         <div className="md:hidden mb-4">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -423,7 +601,7 @@ const StudentSalesManager = () => {
                 />
                 <input
                   type="number"
-                  step="0.01"
+                  step="1"
                   placeholder="Amount (RM)"
                   value={newProduct.price}
                   onChange={(e) =>
@@ -482,183 +660,19 @@ const StudentSalesManager = () => {
               </div>
             </div>
 
+            <ItemTable
+              items={items}
+              onEdit={UpdateModalItem}
+              onDelete={deleteItem}
+            />
             {/* Products Table */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-              {/* Header */}
-              <div className="p-6 border-b text-center border-gray-100 bg-gradient-to-r from-indigo-500 to-purple-500">
-                <h3 className="text-xl font-bold text-white tracking-wide">
-                  Product List
-                </h3>
-              </div>
-
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      {[
-                        "Name",
-                        "Price",
-                        "Stock",
-                        "Description",
-                        "Color",
-                        "Actions",
-                      ].map((header) => (
-                        <th
-                          key={header}
-                          className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-gray-100">
-                    {items.map((i, idx) => (
-                      <tr
-                        key={i._id}
-                        className={`transition-colors ${
-                          idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-gray-50`}
-                      >
-                        {/* Item name */}
-                        <td className="px-6 py-4 font-semibold text-gray-800">
-                          {i.item_name}
-                        </td>
-
-                        {/* Price */}
-                        <td className="px-6 py-4">
-                          <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700 shadow-sm">
-                            RM{i.item_price}
-                          </span>
-                        </td>
-
-                        {/* Stock with conditional badge */}
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex px-3 py-1 rounded-full text-sm font-medium shadow-sm ${
-                              i.item_stock < 10
-                                ? "bg-red-100 text-red-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {i.item_stock}
-                          </span>
-                        </td>
-
-                        {/* Description */}
-                        <td className="px-6 py-4 text-gray-600">
-                          {i.item_description}
-                        </td>
-
-                        {/* Color dot */}
-                        <td className="px-6 py-4">
-                          <span
-                            className="inline-block w-6 h-6 rounded-full border shadow-inner"
-                            style={{ backgroundColor: i.item_color }}
-                          ></span>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="px-6 py-4">
-                          <div className="flex space-x-2">
-                            <button
-                              className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors"
-                              onClick={() => setEditingProduct(true)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
         )}
         {/* Order Management */}
         {activeTab === "orders" && (
           <div className="space-y-6">
             {/* Orders Table */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-              <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-indigo-500 to-purple-500">
-                <h3 className="text-xl font-bold text-center text-white tracking-wide">
-                  Order Management
-                </h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      {[
-                        "Colleague",
-                        "Customer Name",
-                        "Item",
-                        "Quantity",
-                        "Total",
-                        "Date",
-                        "Actions",
-                      ].map((header) => (
-                        <th
-                          key={header}
-                          className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {sales.map((sale, idx) => (
-                      <tr
-                        key={sale._id}
-                        className={`transition-colors ${
-                          idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-indigo-50`}
-                      >
-                        <td className="px-6 py-4 font-semibold text-sm text-indigo-600">
-                          {sale.colleague}
-                        </td>
-                        <td className="px-6 py-4 font-semibold text-gray-800">
-                          {sale.customerName}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">{sale.item}</td>
-                        <td className="px-6 py-4 text-gray-600">
-                          {sale.quantity}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                            RM{sale.total}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-500">
-                          {sale.date.split("T")[0]}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex space-x-2">
-                            <button
-                              className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors"
-                              onClick={() => setEditingProduct(true)}
-                            >
-                              <Edit className="w-4 h-4" onClick={updateItem} />
-                            </button>
-                            <button className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <SalesTable sales={sales} onDelete={deleteSale}></SalesTable>
           </div>
         )}
 
@@ -675,7 +689,7 @@ const StudentSalesManager = () => {
                 <h3 className="text-xl text-center font-bold text-gray-800 mb-4">
                   Add New Expense
                 </h3>
-                <div className=" grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 flex justify-center">
+                <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   {/* Category Dropdown */}
                   <select
                     value={newExpense.category}
@@ -706,7 +720,7 @@ const StudentSalesManager = () => {
                       placeholder="Enter custom category"
                       value={customCategory}
                       onChange={(e) => setCustomCategory(e.target.value)}
-                      className="mt-3 px-4 py-3 border text-black border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full"
+                      className=" px-4 py-3 border text-black border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full"
                     />
                   )}
 
@@ -724,7 +738,7 @@ const StudentSalesManager = () => {
                   />
                   <input
                     type="number"
-                    step="0.01"
+                    step="1"
                     placeholder="Amount (RM)"
                     value={newExpense.amount}
                     onChange={(e) =>
@@ -734,7 +748,7 @@ const StudentSalesManager = () => {
                   />
 
                   <button
-                    onClick={addExpense}
+                    onClick={handleExpense}
                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:cursor-pointer transition-all duration-300 flex items-center justify-center font-semibold"
                   >
                     <Plus className="w-5 h-5 mr-2" />
@@ -743,47 +757,10 @@ const StudentSalesManager = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      {["Category", "Description", "Amount (RM)", "Date"].map(
-                        (header) => (
-                          <th
-                            key={header}
-                            className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
-                          >
-                            {header}
-                          </th>
-                        )
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {expenses.map((expense, idx) => (
-                      <tr
-                        key={expense.id}
-                        className={`transition-colors ${
-                          idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-indigo-50`}
-                      >
-                        <td className="px-6 py-4 font-semibold text-sm text-indigo-600">
-                          {expense.category}
-                        </td>
-                        <td className="px-6 py-4 text-gray-800">
-                          {expense.description}
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">
-                          RM{expense.amount}
-                        </td>
-                        <td className="px-6 py-4 text-gray-500">
-                          {expense.date}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ExpenseTable
+                expense={expenses}
+                onDelete={deleteExpense}
+              ></ExpenseTable>
               <div className="p-4 bg-gray-50 flex justify-end">
                 <p className="font-bold text-gray-800">
                   Total Expenses: RM {totalExpenses.toFixed(2)}
@@ -819,97 +796,129 @@ const StudentSalesManager = () => {
         </div>
       </dialog>
 
+      <dialog id="colorEditModal" className="modal backdrop-blur-sm">
+        <div className="modal-box bg-white">
+          <h3 className="text-center font-bold text-lg text-gray-400">
+            Select Color
+          </h3>
+
+          {/* Form Content */}
+          <div className="mt-4">
+            <SwatchesPicker
+              width={450}
+              className="rounded-xl"
+              color={color}
+              onChange={(colorResult: any) => {
+                setUpdatedProduct({
+                  ...updatedProduct,
+                  color: colorResult.hex,
+                });
+                (
+                  document.getElementById("colorEditModal") as HTMLDialogElement
+                )?.close();
+              }}
+            />
+
+            <div className="modal-action flex gap-3"></div>
+          </div>
+        </div>
+      </dialog>
+
       {/* Edit Product Modal */}
-      {/* {editingProduct && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">
-                      Edit Product
-                    </h3>
-                    <div className="space-y-4">
-                      <input
-                        type="text"
-                        placeholder="Product Name"
-                        value={editingProduct.name}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <input
-                        type="number"
-                        step="0.01"
-                        placeholder="Cost (RM)"
-                        value={editingProduct.cost}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            cost: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <input
-                        type="number"
-                        step="0.01"
-                        placeholder="Price (RM)"
-                        value={editingProduct.price}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            price: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Stock"
-                        value={editingProduct.stock}
-                        onChange={(e) =>
-                          setEditingProduct({
-                            ...editingProduct,
-                            stock: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Product Name"
-                        value={editingProduct.name}
-                        onChange={(e) =>
-                          setEditingProduct(
-                            ...editingProduct,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div className="flex space-x-3 mt-6">
-                      <button
-                        onClick={updateProduct}
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
-                      >
-                        Update
-                      </button>
-                      <button
-                        onClick={() => setEditingProduct(null)}
-                        className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div> 
-              )}
-                */}
+      {editingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">
+              Edit Product
+            </h3>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={updatedProduct.name}
+                onChange={(e) =>
+                  setUpdatedProduct({ ...updatedProduct, name: e.target.value })
+                }
+                className="w-full px-4 py-3 border rounded-xl text-black"
+                placeholder="Product Name"
+              />
+              <input
+                type="number"
+                value={updatedProduct.price}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    price: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border rounded-xl text-black"
+                placeholder="Price (RM)"
+              />
+              <input
+                type="number"
+                value={updatedProduct.stock}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    stock: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border rounded-xl text-black"
+                placeholder="Stock"
+              />
+              <input
+                type="text"
+                value={updatedProduct.description}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border rounded-xl text-black"
+                placeholder="Description"
+              />
+
+              <button
+                onClick={() =>
+                  (
+                    document.getElementById(
+                      "colorEditModal"
+                    ) as HTMLDialogElement
+                  )?.show()
+                }
+                className="flex items-center gap-3 px-4 py-2 border border-gray-300 rounded-xl shadow-sm hover:shadow-md transition-all"
+              >
+                {/* Color preview circle */}
+                <span
+                  className="inline-block w-6 h-6 rounded-full border border-gray-400 shadow-sm"
+                  style={{ backgroundColor: updatedProduct.color }}
+                ></span>
+
+                {/* Label */}
+                <span className="text-sm font-medium text-gray-700">
+                  Choose Color
+                </span>
+              </button>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setEditingProduct(false)}
+                className="px-4 py-2 rounded-xl border text-gray-700 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => updateItem}
+                className="px-6 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default StudentSalesManager;
+}
