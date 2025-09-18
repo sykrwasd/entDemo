@@ -4,13 +4,13 @@ import expense from "@/../models/Expense";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
 
     // ✅ direct access
-    const { id } = await params;
+    const { id } = await context.params;
 
     const deleted = await expense.findByIdAndDelete(id);
 

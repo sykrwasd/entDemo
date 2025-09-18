@@ -2,11 +2,14 @@ import { connectToDatabase } from "@/../lib/mongoose.js";
 import Item from "@/../models/Item.js";
 import mongoose from "mongoose";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function  PUT(
+  req: Request,
+ context: { params: Promise<{ id: string }> }
+) {
   try {
     await connectToDatabase();
 
-    const {id} = await params;
+    const {id} = await context.params;
    
 
     const body = await req.json();

@@ -4,12 +4,12 @@ import mongoose from "mongoose";
 
 export async function  DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
 
-    const {id} = await params;
+    const {id} = await context.params;
    
     const deletedSales = await Sales.findByIdAndDelete(id)
     
