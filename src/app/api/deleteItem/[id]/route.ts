@@ -2,11 +2,14 @@ import { connectToDatabase } from "@/../lib/mongoose.js";
 import Item from "@/../models/Item.js";
 import mongoose from "mongoose";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function  DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectToDatabase();
 
-    const {id} = params;
+    const {id} = await params;
    
     const deletedItem = await Item.findByIdAndDelete(id)
     

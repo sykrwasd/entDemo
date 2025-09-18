@@ -6,7 +6,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   try {
     await connectToDatabase();
 
-    const {id} = params;
+    const {id} = await params;
    
 
     const body = await req.json();

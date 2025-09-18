@@ -1,19 +1,36 @@
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/../lib/mongoose.js";
-import mongoose from "mongoose";
 import expense from "@/../models/Expense";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectToDatabase();
 
-    const {id} = params;
-   
-    const deleted = await expense.findByIdAndDelete(id)
-    
+    // ✅ direct access
+    const { id } = await params;
 
-    return new Response(JSON.stringify(deleted), { status: 200 });
-  } catch (err) {
-    console.error("Error updating item:", err);
-    return new Response(JSON.stringify({ error: "Failed to update item" }), { status: 500 });
+    const deleted = await expense.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return NextResponse.json(
+        { success: false, message: "Expense not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Expense deleted successfully",
+      deleted,
+    });
+  } catch (err: any) {
+    console.error("Error deleting expense:", err);
+    return NextResponse.json(
+      { success: false, error: "Failed to delete expense" },
+      { status: 500 }
+    );
   }
 }

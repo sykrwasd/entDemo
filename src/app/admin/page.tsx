@@ -12,8 +12,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
   Legend,
 } from "recharts";
 import {
@@ -22,10 +20,7 @@ import {
   TrendingUp,
   AlertTriangle,
   Plus,
-  Edit,
-  Trash2,
-  Search,
-  Filter,
+ 
   X,
   Menu,
 } from "lucide-react";
@@ -910,7 +905,7 @@ export default function StudentSalesManager() {
                 Cancel
               </button>
               <button
-                onClick={() => updateItem}
+                onClick={() => updateItem(updatedProduct._id)}
                 className="px-6 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold"
               >
                 Save
