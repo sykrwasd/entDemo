@@ -20,7 +20,6 @@ import {
   TrendingUp,
   AlertTriangle,
   Plus,
- 
   X,
   Menu,
 } from "lucide-react";
@@ -77,7 +76,9 @@ export default function StudentSalesManager() {
     getItems().then(setItems);
     getExpense().then(setExpenses);
     getSales().then(setSales);
+   
   }, []);
+  
 
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
@@ -90,6 +91,7 @@ export default function StudentSalesManager() {
     type: " ",
     message: " ",
   });
+  const [isOpen,setIsOpen] = useState(true)
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -99,6 +101,9 @@ export default function StudentSalesManager() {
     color: defaultcolor,
   });
 
+  const [shopName, setShopName] = useState("");
+  const [primaryColor, setPrimaryColor] = useState("#8B5CF6"); // default
+  const [secondaryColor, setSecondaryColor] = useState("#3B82F6"); // default
   const [newExpense, setNewExpense] = useState({
     category: "",
     description: "",
@@ -107,7 +112,7 @@ export default function StudentSalesManager() {
   });
   const [customCategory, setCustomCategory] = useState("");
   const [editingProduct, setEditingProduct] = useState(false);
-  const [editingExpense, setEditingExpense] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [updatedProduct, setUpdatedProduct] = useState({
     _id: "",
@@ -156,7 +161,7 @@ export default function StudentSalesManager() {
   const lowStockItems = items.filter((item) => item.item_stock < 5);
 
   async function addProduct() {
-    setLoading(true)
+    setLoading(true);
     try {
       await addItem(newProduct);
       const update = await getItems();
@@ -187,7 +192,7 @@ export default function StudentSalesManager() {
         });
       }, 10);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
   async function handleExpense() {
@@ -200,7 +205,7 @@ export default function StudentSalesManager() {
     };
 
     console.log(expenseToSave);
-    setLoading(true)
+    setLoading(true);
     try {
       await addExpense(expenseToSave);
       const update = await getExpense();
@@ -230,13 +235,12 @@ export default function StudentSalesManager() {
         });
       }, 10);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
-
   async function updateItem(id: string) {
     UpdateModalItem(id);
-    setLoading(true)
+    setLoading(true);
     try {
       await updateProduct(updatedProduct);
       const update = await getItems();
@@ -258,8 +262,8 @@ export default function StudentSalesManager() {
           message: "Product failed to add, try again",
         });
       }, 10);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
     setEditingProduct(false);
     //console.log(updatedProduct);
@@ -281,9 +285,8 @@ export default function StudentSalesManager() {
       color: product.item_color,
     });
   };
-
   async function deleteItem(id: string) {
-    setLoading(true)
+    setLoading(true);
     try {
       await deleteItemRoute(id);
       const update = await getItems();
@@ -306,12 +309,11 @@ export default function StudentSalesManager() {
         });
       }, 10);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
-
   async function deleteSale(id: string) {
-    setLoading(true)
+    setLoading(true);
     try {
       await deleteSalesRoute(id);
       const update = await getSales();
@@ -334,12 +336,11 @@ export default function StudentSalesManager() {
         });
       }, 10);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
-
   async function deleteExpense(id: string) {
-    setLoading(true)
+    setLoading(true);
     try {
       await deleteExpenseRoute(id);
       const update = await getExpense();
@@ -362,7 +363,7 @@ export default function StudentSalesManager() {
         });
       }, 10);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
   const pieData = items
@@ -380,6 +381,10 @@ export default function StudentSalesManager() {
     })
     .filter((d) => d.value > 0); // remove items with 0 sales
 
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
   const tabs = ["dashboard", "products", "orders", "expenses"];
 
   return (
@@ -391,15 +396,14 @@ export default function StudentSalesManager() {
       {loading && (
         <div className="fixed inset-0 bg-transparent bg-opacity-40 flex items-center justify-center z-50 ">
           <div className="flex flex-col items-center">
-            
-          <RingLoader color="black" speedMultiplier={2}/>
+            <RingLoader color="black" speedMultiplier={2} />
             <p className="mt-4 text-black font-semibold">Loading...</p>
           </div>
         </div>
       )}
       <div className="container mx-auto p-6">
         {/* Header */}
-        <div className="bg-white rounded-3xl p-8 mb-8 shadow-lg border border-gray-100">
+        <div className="bg-white rounded-3xl p-8 mb-8 shadow-lg border border-gray-100 relative">
           <div className="text-center">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
               Student Sales Manager
@@ -764,6 +768,10 @@ export default function StudentSalesManager() {
             </div>
           </div>
         )}
+
+    
+
+
       </div>
 
       <dialog id="colorModal" className="modal backdrop-blur-sm">
@@ -914,6 +922,64 @@ export default function StudentSalesManager() {
           </div>
         </div>
       )}
+
+      {isOpen && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full relative animate-fadeIn">
+      {/* Close Button */}
+      <button
+        onClick={closeModal}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+
+      {/* Header */}
+      <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        Welcome to Student Sales Manager (Demo)
+      </h2>
+
+      {/* Content */}
+      <p className="text-gray-600 text-center leading-relaxed mb-6">
+        You’re currently exploring a{" "}
+        <span className="font-semibold text-purple-600">demo version</span> of
+        the Student Sales Manager template.  
+        <br />
+        The <span className="font-semibold">final product</span> will include:
+      </p>
+
+      <ul className="text-gray-700 space-y-3 mb-6">
+        <li className="flex items-start gap-2">
+          <span className="text-green-500">✔</span>
+          <span>Full backend integration with MongoDB</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-blue-500">🎨</span>
+          <span>Customizable shop settings & themes</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-purple-500">📊</span>
+          <span>Enhanced reports & analytics</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="text-yellow-500">📂</span>
+          <span>Export to PDF/Excel</span>
+        </li>
+      </ul>
+
+      {/* CTA */}
+      <div className="text-center">
+        <button
+          onClick={closeModal}
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:opacity-90 transition"
+        >
+          🚀 Explore Demo
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
