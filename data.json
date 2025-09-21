@@ -1,182 +1,166 @@
 [
   {
-    "customerName": "Customer 1",
+    "customerName": "Ahmad Ali",
     "colleague": "Alpha",
-    "item": "Spicy Chicken Wings",
+    "item": "Nasi Lemak",
+    "quantity": 2,
+    "price": 5.0,
+    "total": 10.0,
+    "date": "2025-09-01T09:30:00.000Z"
+  },
+  {
+    "customerName": "Siti Nur",
+    "colleague": "Beta",
+    "item": "Iced Milo",
     "quantity": 3,
-    "price": 15.0,
-    "total": 45.0,
-    "date": "2025-09-01T10:15:00Z"
+    "price": 3.0,
+    "total": 9.0,
+    "date": "2025-09-02T14:15:00.000Z"
   },
   {
-    "customerName": "Customer 5",
-    "colleague": "Beta",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-01T13:40:00Z"
+    "customerName": "John Lim",
+    "colleague": "Gamma",
+    "item": "Roti Canai",
+    "quantity": 5,
+    "price": 2.0,
+    "total": 10.0,
+    "date": "2025-09-03T08:45:00.000Z"
   },
   {
-    "customerName": "Customer 8",
+    "customerName": "Nurul Aisyah",
     "colleague": "Alpha",
-    "item": "test",
+    "item": "Teh Tarik",
+    "quantity": 4,
+    "price": 2.5,
+    "total": 10.0,
+    "date": "2025-09-04T18:20:00.000Z"
+  },
+  {
+    "customerName": "David Wong",
+    "colleague": "Beta",
+    "item": "Spaghetti Bolognese",
+    "quantity": 1,
+    "price": 10.0,
+    "total": 10.0,
+    "date": "2025-09-05T12:05:00.000Z"
+  },
+  {
+    "customerName": "Aina Sofea",
+    "colleague": "Gamma",
+    "item": "Chocolate Cake Slice",
     "quantity": 2,
-    "price": 12.0,
-    "total": 24.0,
-    "date": "2025-09-02T11:05:00Z"
+    "price": 4.5,
+    "total": 9.0,
+    "date": "2025-09-06T15:40:00.000Z"
   },
+
   {
-    "customerName": "Customer 3",
-    "colleague": "Beta",
-    "item": "Spicy Chicken Wings",
-    "quantity": 1,
-    "price": 15.0,
-    "total": 15.0,
-    "date": "2025-09-03T15:20:00Z"
-  },
-  {
-    "customerName": "Customer 6",
+    "customerName": "Hafiz Rahman",
     "colleague": "Alpha",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-03T09:50:00Z"
-  },
-  {
-    "customerName": "Customer 7",
-    "colleague": "Beta",
-    "item": "test",
+    "item": "Mee Goreng",
     "quantity": 3,
-    "price": 12.0,
-    "total": 36.0,
-    "date": "2025-09-04T14:30:00Z"
+    "price": 6.0,
+    "total": 18.0,
+    "date": "2025-09-08T11:10:00.000Z"
   },
   {
-    "customerName": "Customer 2",
-    "colleague": "Alpha",
-    "item": "Spicy Chicken Wings",
+    "customerName": "Chong Wei",
+    "colleague": "Beta",
+    "item": "Kopi O",
     "quantity": 2,
-    "price": 15.0,
-    "total": 30.0,
-    "date": "2025-09-05T12:10:00Z"
+    "price": 2.0,
+    "total": 4.0,
+    "date": "2025-09-09T08:50:00.000Z"
   },
   {
-    "customerName": "Customer 9",
-    "colleague": "Beta",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-06T16:45:00Z"
-  },
-  {
-    "customerName": "Customer 12",
-    "colleague": "Alpha",
-    "item": "test",
+    "customerName": "Lisa Tan",
+    "colleague": "Gamma",
+    "item": "Fried Rice",
     "quantity": 2,
-    "price": 12.0,
-    "total": 24.0,
-    "date": "2025-09-07T10:00:00Z"
+    "price": 7.0,
+    "total": 14.0,
+    "date": "2025-09-10T13:25:00.000Z"
   },
   {
-    "customerName": "Customer 4",
-    "colleague": "Beta",
-    "item": "Spicy Chicken Wings",
-    "quantity": 1,
-    "price": 15.0,
-    "total": 15.0,
-    "date": "2025-09-08T11:20:00Z"
-  },
-  {
-    "customerName": "Customer 10",
+    "customerName": "Farah Iman",
     "colleague": "Alpha",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-09T14:10:00Z"
-  },
-  {
-    "customerName": "Customer 11",
-    "colleague": "Beta",
-    "item": "test",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-10T09:30:00Z"
-  },
-  {
-    "customerName": "Customer 5",
-    "colleague": "Alpha",
-    "item": "Spicy Chicken Wings",
-    "quantity": 2,
-    "price": 15.0,
-    "total": 30.0,
-    "date": "2025-09-11T13:45:00Z"
-  },
-  {
-    "customerName": "Customer 8",
-    "colleague": "Beta",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-12T16:20:00Z"
-  },
-  {
-    "customerName": "Customer 2",
-    "colleague": "Alpha",
-    "item": "test",
-    "quantity": 2,
-    "price": 12.0,
-    "total": 24.0,
-    "date": "2025-09-13T10:50:00Z"
-  },
-  {
-    "customerName": "Customer 7",
-    "colleague": "Beta",
-    "item": "Spicy Chicken Wings",
-    "quantity": 1,
-    "price": 15.0,
-    "total": 15.0,
-    "date": "2025-09-14T12:40:00Z"
-  },
-  {
-    "customerName": "Customer 9",
-    "colleague": "Alpha",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
-    "total": 12.0,
-    "date": "2025-09-15T15:05:00Z"
-  },
-  {
-    "customerName": "Customer 6",
-    "colleague": "Beta",
-    "item": "test",
+    "item": "Iced Lemon Tea",
     "quantity": 3,
-    "price": 12.0,
-    "total": 36.0,
-    "date": "2025-09-16T11:30:00Z"
+    "price": 3.5,
+    "total": 10.5,
+    "date": "2025-09-11T16:40:00.000Z"
   },
   {
-    "customerName": "Customer 3",
-    "colleague": "Alpha",
-    "item": "Spicy Chicken Wings",
-    "quantity": 2,
-    "price": 15.0,
-    "total": 30.0,
-    "date": "2025-09-17T14:55:00Z"
-  },
-  {
-    "customerName": "Customer 12",
+    "customerName": "Daniel Lee",
     "colleague": "Beta",
-    "item": "biru",
-    "quantity": 1,
-    "price": 12.0,
+    "item": "Burger Ayam",
+    "quantity": 2,
+    "price": 8.0,
+    "total": 16.0,
+    "date": "2025-09-12T19:15:00.000Z"
+  },
+  {
+    "customerName": "Amira Zain",
+    "colleague": "Gamma",
+    "item": "Curry Puff",
+    "quantity": 5,
+    "price": 1.5,
+    "total": 7.5,
+    "date": "2025-09-13T10:20:00.000Z"
+  },
+
+  {
+    "customerName": "Ahmad Ali",
+    "colleague": "Alpha",
+    "item": "Nasi Lemak",
+    "quantity": 4,
+    "price": 5.0,
+    "total": 20.0,
+    "date": "2025-09-15T09:30:00.000Z"
+  },
+  {
+    "customerName": "Siti Nur",
+    "colleague": "Beta",
+    "item": "Iced Milo",
+    "quantity": 2,
+    "price": 3.0,
+    "total": 6.0,
+    "date": "2025-09-16T14:15:00.000Z"
+  },
+  {
+    "customerName": "John Lim",
+    "colleague": "Gamma",
+    "item": "Roti Canai",
+    "quantity": 6,
+    "price": 2.0,
     "total": 12.0,
-    "date": "2025-09-18T10:20:00Z"
+    "date": "2025-09-17T08:45:00.000Z"
+  },
+  {
+    "customerName": "Nurul Aisyah",
+    "colleague": "Alpha",
+    "item": "Teh Tarik",
+    "quantity": 3,
+    "price": 2.5,
+    "total": 7.5,
+    "date": "2025-09-18T18:20:00.000Z"
+  },
+  {
+    "customerName": "David Wong",
+    "colleague": "Beta",
+    "item": "Spaghetti Bolognese",
+    "quantity": 2,
+    "price": 10.0,
+    "total": 20.0,
+    "date": "2025-09-19T12:05:00.000Z"
+  },
+  {
+    "customerName": "Aina Sofea",
+    "colleague": "Gamma",
+    "item": "Chocolate Cake Slice",
+    "quantity": 1,
+    "price": 4.5,
+    "total": 4.5,
+    "date": "2025-09-20T15:40:00.000Z"
   }
 ]

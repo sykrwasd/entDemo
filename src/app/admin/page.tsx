@@ -76,9 +76,7 @@ export default function StudentSalesManager() {
     getItems().then(setItems);
     getExpense().then(setExpenses);
     getSales().then(setSales);
-   
   }, []);
-  
 
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
@@ -91,7 +89,7 @@ export default function StudentSalesManager() {
     type: " ",
     message: " ",
   });
-  const [isOpen,setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(true);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -385,6 +383,8 @@ export default function StudentSalesManager() {
     setIsOpen(false);
   };
 
+  const profit = totalRevenue - totalExpenses;
+
   const tabs = ["dashboard", "products", "orders", "expenses"];
 
   return (
@@ -476,12 +476,13 @@ export default function StudentSalesManager() {
                 subtitle={"All Time"}
               />
               <StatCard
-                title="Items"
-                value={items.length}
-                icon={Package}
-                color="text-purple-600"
-                subtitle={"On Sale"}
+                title="Profit"
+                value={`RM ${profit.toFixed(2)}`}
+                icon={TrendingUp}
+                color={profit >= 0 ? "text-green-600" : "text-red-600"}
+                subtitle="Revenue - Expenses"
               />
+
               <StatCard
                 title="Low Stock Alert"
                 value={lowStockItems.length}
@@ -531,7 +532,7 @@ export default function StudentSalesManager() {
                       data={pieData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={100}
+                      outerRadius={80}
                       label
                     >
                       {pieData.map((entry, index) => (
@@ -768,10 +769,6 @@ export default function StudentSalesManager() {
             </div>
           </div>
         )}
-
-    
-
-
       </div>
 
       <dialog id="colorModal" className="modal backdrop-blur-sm">
@@ -924,62 +921,64 @@ export default function StudentSalesManager() {
       )}
 
       {isOpen && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full relative animate-fadeIn">
-      {/* Close Button */}
-      <button
-        onClick={closeModal}
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full relative animate-fadeIn">
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
 
-      {/* Header */}
-      <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-        Welcome to Student Sales Manager (Demo)
-      </h2>
+            {/* Header */}
+            <h2 className="text-2xl font-bold text-center mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Welcome to Student Sales Manager (Demo)
+            </h2>
 
-      {/* Content */}
-      <p className="text-gray-600 text-center leading-relaxed mb-6">
-        You’re currently exploring a{" "}
-        <span className="font-semibold text-purple-600">demo version</span> of
-        the Student Sales Manager template.  
-        <br />
-        The <span className="font-semibold">final product</span> will include:
-      </p>
+            {/* Content */}
+            <p className="text-gray-600 text-center leading-relaxed mb-6">
+              You’re currently exploring a{" "}
+              <span className="font-semibold text-purple-600">
+                demo version
+              </span>{" "}
+              of the Student Sales Manager template.
+              <br />
+              The <span className="font-semibold">final product</span> will
+              include:
+            </p>
 
-      <ul className="text-gray-700 space-y-3 mb-6">
-        <li className="flex items-start gap-2">
-          <span className="text-green-500">✔</span>
-          <span>Full backend integration with MongoDB</span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="text-blue-500">🎨</span>
-          <span>Customizable shop settings & themes</span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="text-purple-500">📊</span>
-          <span>Enhanced reports & analytics</span>
-        </li>
-        <li className="flex items-start gap-2">
-          <span className="text-yellow-500">📂</span>
-          <span>Export to PDF/Excel</span>
-        </li>
-      </ul>
+            <ul className="text-gray-700 space-y-3 mb-6">
+              <li className="flex items-start gap-2">
+                <span className="text-green-500">✔</span>
+                <span>Full backend integration with MongoDB</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500">🎨</span>
+                <span>Customizable shop settings & themes</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-500">📊</span>
+                <span>Enhanced reports & analytics</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-500">📂</span>
+                <span>Export to PDF/Excel</span>
+              </li>
+            </ul>
 
-      {/* CTA */}
-      <div className="text-center">
-        <button
-          onClick={closeModal}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:opacity-90 transition"
-        >
-          🚀 Explore Demo
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+            {/* CTA */}
+            <div className="text-center">
+              <button
+                onClick={closeModal}
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold hover:opacity-90 transition"
+              >
+                🚀 Explore Demo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
