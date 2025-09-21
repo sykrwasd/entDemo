@@ -524,15 +524,18 @@ export default function StudentSalesManager() {
                 <h3 className="text-xl font-bold text-gray-800 mb-4">
                   Sales by Product (RM)
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
+
+                <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
                       dataKey="value"
-                      isAnimationActive={false}
                       data={pieData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={80}
+                      // radius adjusts with screen size
+                      outerRadius="70%"
+                      innerRadius="20%"
+                      labelLine={false}
                       label
                     >
                       {pieData.map((entry, index) => (
@@ -541,7 +544,7 @@ export default function StudentSalesManager() {
                     </Pie>
                     <Tooltip
                       formatter={(value: number, name: string) => [
-                        `${value}`,
+                        `RM ${value}`,
                         name,
                       ]}
                     />
@@ -550,6 +553,7 @@ export default function StudentSalesManager() {
                       align="center"
                       verticalAlign="bottom"
                       iconType="circle"
+                      wrapperStyle={{ fontSize: "12px" }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
